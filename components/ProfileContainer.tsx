@@ -15,19 +15,19 @@ const difficulties = [
       id: "EASY",
       level: "Easy",
       description:
-        "This challenge level is for people who are new to programming. Receive 3 challenges per day (7:30AM, 12PM, & 5:30PM EST).",
+        "This challenge level is for people who are beginners. Receive 3 challenges per day (7:30AM, 12PM, & 5:30PM EST).",
     },
     {
       id: "MEDIUM",
       level: "Medium",
       description:
-        "This challenge level is for people who are familiar with programming. Receive 4 challenges per day (7AM, 12PM, 5PM, & 8PM EST).",
+        "This challenge level is for people who are moderately familiar with fitness. Receive 4 challenges per day (7AM, 12PM, 5PM, & 8PM EST).",
     },
     {
       id: "HARD",
       level: "Hard",
       description:
-        "This challenge level is for people who are experienced with programming. Receive 5 challenges per day (6AM, 9AM, 12PM, 5PM, & 8PM EST).",
+        "This challenge level is for people who are on there grind, ready for any challenge. Receive 5 challenges per day (6AM, 9AM, 12PM, 5PM, & 8PM EST).",
     },
   ];
   
