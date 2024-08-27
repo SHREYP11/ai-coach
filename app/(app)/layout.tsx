@@ -5,8 +5,9 @@ import Navbar from "@/components/Navbar";
 import { Assistant, UserThread } from "@prisma/client";
 import axios from "axios";
 import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import NotificationModal from "@/components/NotificationModal";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
    //if user doesnt have threadid, make one
@@ -20,6 +21,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
    const [assistant, setAssistant] = useAtom(assistantAtom);
 
 
+    // State
+  const [isNotificationModalVisible, setIsNotificationModalVisible] =
+  useState(false);
+
+
+//hook
   useServiceWorker();
    
    useEffect(() => {
@@ -85,15 +92,57 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     }
       getUserThread();
-      
-    
-
-   
-
 
   
 
    },[setUserThread]);
+
+
+   useEffect(() => {
+    if ("Notification" in window) {
+      setIsNotificationModalVisible(Notification.permission === "default");
+      console.log("Notification permission:", Notification.permission);
+    }
+  }, []);
+
+  const saveSubscription = useCallback(async () => {
+    const serviceWorkerRegistration = await navigator.serviceWorker.ready;
+    const subscription = await serviceWorkerRegistration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+    });
+
+    try {
+      const response = await axios.post("/api/subscription", subscription);
+
+      if (!response.data.success) {
+        console.error(response.data.message ?? "Unknown error.");
+        toast.error("Failed to save subscription.");
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save subscription.");
+    }
+  }, []);
+
+  useEffect(() => {
+    if ("Notification" in window && "serviceWorker" in navigator) {
+      if (Notification.permission === "granted") {
+        saveSubscription();
+      }
+    }
+  }, [saveSubscription]);
+
+  const handleNotificationModalClose = (didConstent: boolean) => {
+    setIsNotificationModalVisible(false);
+
+    if (didConstent) {
+      toast.success("You will now receive notifications.");
+    }
+  };
+
+
 
    
   
@@ -103,6 +152,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <Navbar />
             {/*TODO: NavBar */}
             {children}
+            {isNotificationModalVisible && (
+        <NotificationModal
+          onRequestClose={handleNotificationModalClose}
+          saveSubscription={saveSubscription}
+        />
+      )}
             <Toaster />
         </div>
       
