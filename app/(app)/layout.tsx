@@ -1,5 +1,5 @@
 "use client";
-
+import useServiceWorker from "@/hooks/useServiceWorker";
 import { assistantAtom, userThreadAtom } from "@/atoms";
 import Navbar from "@/components/Navbar";
 import { Assistant, UserThread } from "@prisma/client";
@@ -20,7 +20,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
    const [assistant, setAssistant] = useAtom(assistantAtom);
 
 
-
+  useServiceWorker();
    
    useEffect(() => {
 
