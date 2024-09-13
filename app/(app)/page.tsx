@@ -42,7 +42,7 @@ const Home = () => {
 
      {/* Call to Action with Link to Chat Page */}
      <Link href="/chat">
-        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg mb-8">
+        <button className="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded-lg mb-8">
           Start Practicing Now
         </button>
       </Link>

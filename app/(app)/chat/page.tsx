@@ -282,7 +282,7 @@ function ChatPage() {
             (message.metadata as { fromUser?: string }).fromUser ?? ""
           )
             ? "bg-red-500 ml-auto"
-            : "bg-gray-600"}`}>
+            : "bg-gray-800"}`}>
               {message.content[0].type === "text" ? message.content[0].text.value
           .split("\n")
           .map((text, index) => <p key={index}>{text}</p>): null}</div>) )}
@@ -307,7 +307,7 @@ function ChatPage() {
       {/* INPUT */}
 
            <div className="mt-auto p-4 bg-black">
-        <div className="flex items-center bg-gray-600 p-2 rounded-full">
+        <div className="flex items-center bg-gray-800 p-2 rounded-full">
           <input
             type="text"
             className="flex-grow bg-transparent rounded-full pl-6 py-2 text-white focus:outline-none"
