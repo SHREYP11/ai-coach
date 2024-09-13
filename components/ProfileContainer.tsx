@@ -11,25 +11,32 @@ import toast from 'react-hot-toast';
 
 
 const difficulties = [
-    {
-      id: "EASY",
-      level: "Easy",
-      description:
-        "This challenge level is for people who are beginners. Receive 3 challenges per day (7:30AM, 12PM, & 5:30PM EST).",
-    },
-    {
-      id: "MEDIUM",
-      level: "Medium",
-      description:
-        "This challenge level is for people who are moderately familiar with fitness. Receive 4 challenges per day (7AM, 12PM, 5PM, & 8PM EST).",
-    },
-    {
-      id: "HARD",
-      level: "Hard",
-      description:
-        "This challenge level is for people who are on there grind, ready for any challenge. Receive 5 challenges per day (6AM, 9AM, 12PM, 5PM, & 8PM EST).",
-    },
-  ];
+  {
+    id: "EASY",
+
+    level: "Easy",
+
+    description:
+      "This difficulty level is for people who are just starting out with MCAT prep. Receive 1 passage per day (sent at 12PM EST). The passage can be from any of the four MCAT sections: Biological and Biochemical Foundations of Living Systems (BBLS), Chemical and Physical Foundations of Biological Systems (CPBS), Psychological, Social, and Biological Foundations of Behavior (PSBB), or Critical Analysis and Reasoning Skills (CARS). Each passage is followed by 5 questions focused on fundamental concepts.",
+  },
+  {
+    id: "MEDIUM",
+
+    level: "Medium",
+
+    description:
+      "This difficulty level is for people with a moderate understanding of MCAT subjects. Receive 2 passages per day (9AM and 12PM EST). Each passage can be from any of the four MCAT sections (BBLS, CPBS, PSBB, or CARS) and will include 5 questions per passage. The questions will require analysis and some application of concepts.",
+  },
+  {
+    id: "HARD",
+
+    level: "Hard",
+
+    description:
+      "This difficulty level is for people who are ready for a serious challenge. Receive 4 passages per day (6AM, 9AM, 12PM, and 5PM EST). Each passage will focus on one of the four MCAT sections: Biological and Biochemical Foundations of Living Systems (BBLS), Chemical and Physical Foundations of Biological Systems (CPBS), Psychological, Social, and Biological Foundations of Behavior (PSBB), and Critical Analysis and Reasoning Skills (CARS). Each passage will include 5 questions that push you with advanced concepts and critical thinking.",
+  },
+];
+
   
   type Difficulties = "EASY" | "MEDIUM" | "HARD";
 
@@ -96,7 +103,7 @@ function ProfileContainer({challengePreferences}: ProfileContainerProps) {
     <div className="flex flex-col">
 
       <div className="flex flex-row justify-between items-center mb-4">
-        <h1 className="font-bold text-2xl">Challenge Level</h1>
+        <h1 className="font-bold text-2xl">Level Difficulty</h1>
         <Button onClick={handleSave}>{saving ? "Saving..." : "Save"}</Button>
       </div>
      
@@ -105,7 +112,7 @@ function ProfileContainer({challengePreferences}: ProfileContainerProps) {
           <h3 className="font-medium text-lg  text-gray-900">
             Push Notifications
           </h3>
-          <p>Receive push notifications when new challenges are available.</p>
+          <p>Receive notifications when new passages and questions are available.</p>
         </div>
         <Switch
           checked={sendNotifications}

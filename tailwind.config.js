@@ -16,6 +16,11 @@ module.exports = {
         "2xl": "1400px",
       },
     },
+
+    fontFamily:{
+      primary: "var(--font-Kanit)",
+
+    },
     extend: {
       colors: {
         border: "hsl(var(--border))",

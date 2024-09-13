@@ -33,10 +33,10 @@ function NotificationModal({
           Allow to send push notifications
         </h2>
         <p className="mb-4">
-          Receive notifications from Goggins AI when new workouts are available.
+          Receive notifications from docCoach when new passages are available.
         </p>
         <button
-          className="bg-yellow-500 text-white py-2 px-4 rounded-lg"
+          className="bg-red-500 text-white py-2 px-4 rounded-lg"
           onClick={requestNotificationPermission}
         >
           Allow

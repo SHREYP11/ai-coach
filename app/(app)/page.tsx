@@ -1,316 +1,53 @@
-"use client";
-import { Run, ThreadMessage } from 'openai/resources/beta/threads/index.mjs';
-import React, { useCallback, useEffect, useState } from 'react';
-import axios from 'axios';
-import { useAtom } from 'jotai';
-import { assistantAtom, userThreadAtom } from "@/atoms";
-import toast from "react-hot-toast";
+import React from 'react';
+import Link from 'next/link';
+import coach from '../../components/coach.png'
 
-
-const POLLING_FREQUENCY_MS = 1000;
-
-function ChatPage() {
-
-  const [userThread] = useAtom(userThreadAtom);
-  const [assistant] = useAtom(assistantAtom);
-
-  const [fetching,setFetching] = useState(false);
-  const [messages, setMessages] = useState<ThreadMessage[]>([]); 
-  const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false)
-  const [pollingRun, setPollingRun]= useState(false);
-
-  console.log("userThread", userThread);
-  console.log("messages", messages);
-  
-
-  const fetchMessages = useCallback(
-
-    async () => { 
-      if (!userThread) return;
-  
-      setFetching(true);
-  
-      try {
-        const response = await axios.post<{
-          success: Boolean, 
-          error?:string, 
-          messages?: ThreadMessage[];
-        }>("/api/message/list", { threadId: userThread.threadId });
-  
-    
-          // Validation
-          if (!response.data.success || !response.data.messages) {
-            console.error(response.data.error ?? "Unknown error.");
-            setFetching(false);
-            return;
-          }
-    
-    
-        let newMessages = response.data.messages;
-        
-    
-        newMessages = newMessages
-        .sort((a, b) => {
-          return (
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-          );
-        })
-        .filter(
-          (message) =>
-            message.content[0].type === "text" &&
-            message.content[0].text.value.trim() !== ""
-        );
-    
-      setMessages(newMessages);
-
-
-    } catch (error){
-      console.error(error);
-      setFetching(false);
-      setMessages([]);
-  
-    } finally {
-      setFetching(false);
-    }
-  
-      },[userThread])
-  
-  
-  
-
-    useEffect(() => {
-      const intervalId = setInterval(fetchMessages, POLLING_FREQUENCY_MS);
-  
-      // Clean up on unmount
-      return () => clearInterval(intervalId);
-    }, [fetchMessages]);
-
-
-    const startRun = async (
-      threadId: string,
-      assistantId: string
-    ): Promise<string> => {
-      // api/run/create
-      try {
-        const {
-          data: { success, run, error },
-        } = await axios.post<{
-          success: boolean;
-          error?: string;
-          run?: Run;
-        }>("api/run/create", {
-          threadId,
-          assistantId,
-        });
-  
-        if (!success || !run) {
-          console.error(error);
-          toast.error("Failed to start run.");
-          return "";
-        }
-  
-        return run.id;
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to start run.");
-        return "";
-      }
-    };
-
-
-    const pollRunStatus = async (threadId: string, runId: string) => {
-      // api/run/retrieve
-      setPollingRun(true);
-  
-      const intervalId = setInterval(async () => {
-        try {
-          const {
-            data: { run, success, error },
-          } = await axios.post<{
-            success: boolean;
-            error?: string;
-            run?: Run;
-          }>("api/run/retrieve", {
-            threadId,
-            runId,
-          });
-  
-          if (!success || !run) {
-            console.error(error);
-            toast.error("Failed to poll run status.");
-            return;
-          }
-  
-          console.log("run", run);
-  
-          if (run.status === "completed") {
-            clearInterval(intervalId);
-            setPollingRun(false);
-            fetchMessages();
-            return;
-          } else if (run.status === "failed") {
-            clearInterval(intervalId);
-            setPollingRun(false);
-            toast.error("Run failed.");
-            return;
-          }
-        } catch (error) {
-          console.error(error);
-          toast.error("Failed to poll run status.");
-          clearInterval(intervalId);
-        }
-      }, POLLING_FREQUENCY_MS);
-  
-      // Clean up on unmount
-      return () => clearInterval(intervalId);
-    };
-
-
-
-  
-
-    
-
-
-    const sendMessage = async () => {
-
-
-      if (!userThread || sending || !assistant) {
-        toast.error("Failed to send message. Invalid state. ")
-        return};
-
-        setSending(true);
-
-        try {
-
-          const {
-            data: { message: newMessages },
-          } = await axios.post<{success: boolean, message?: ThreadMessage, error?: string
-    
-          }>("/api/message/create",{
-            message,
-            threadId: userThread.threadId,
-            fromUser: 'true',
-          });
-    
-          if(!newMessages)  {
-            console.error("No message returned.")
-            toast.error("Failed to send message. Please try again, ")
-            return;
-    
-    
-          }
-          setMessages((prev) => [...prev, newMessages]);
-          setMessage("");
-          toast.success("Message sent.");
-
-          const runId = await startRun(userThread.threadId, assistant.assistantId)
-          if (!runId){
-            toast.error("failed to start run");
-            return;
-
-          }
-          pollRunStatus(userThread.threadId, runId);
-
-        } catch(error) {
-          console.error(error);
-          toast.error("Failed to send message. Please try again. ")
-        } finally {
-          setSending(false);
-        }
-
-  
-
-
-
-
-
-    };
-  
-
+const Home = () => {
   return (
-    <div className="w-screen h-[calc(100vh-64px)] flex flex-col bg-black text-white">
-
-
-        {/* MESSAGES */}
-
-        <div className="flex-grow overflow-y-scroll p-8 space-y-2">
-
-                    {/* 1. FETCHING MESSAGES */}
-
-
-        {fetching && messages.length === 0 && ( <div className="text-center font-bold">Fetching...</div>)}
-
-
-
-     {/* 2. NO MESSAGES */}
-     {messages.length === 0 && !fetching && (
-      <div className="text-center font-bold">No messages.</div>
-     )}
-
-
-          {/* 3. LISTING OUT THE MESSAGES */}
-
-          {messages.map((message) => (<div key ={message.id}
-          className={`px-4 py-2 mb-3 rounded-lg w-fit text-lg ${ 
-            ["true", "True"].includes(
-            (message.metadata as { fromUser?: string }).fromUser ?? ""
-          )
-            ? "bg-yellow-500 ml-auto"
-            : "bg-gray-700"}`}>
-              {message.content[0].type === "text" ? message.content[0].text.value
-          .split("\n")
-          .map((text, index) => <p key={index}>{text}</p>): null}</div>) )}
-
-
-
-        </div>
-
-
-
-
-         
-
+    <div className="flex flex-col items-center justify-center h-auto min-h-screen bg-black text-center text-white p-4">
+      {/* Title */}
+      <h1 className="text-3xl md:text-5xl font-bold mb-6">Ready to push yourself beyond your limits?</h1>
       
+      {/* Image */}
+      <img src={coach.src}  alt="coach logo"  className="w-64 md:w-96 h-48 md:h-72 object-cover rounded-lg shadow-lg mb-6"
+      />
+      
+      {/* Welcome Statement */}
+      <p className="text-lg md:text-xl mb-4">This AI-powered MCAT coach is here to push you beyond your limits.</p>
+      
+      {/* Message: App Purpose */}
+      <p className="text-md md:text-lg mb-8 px-4 md:px-8">
+        You’ll get real-time feedback, designed to sharpen your skills and keep you focused on your goal. Plus, you’ll receive daily passages tailored to three difficulty levels, ensuring you stay sharp and ready to conquer the exam. Keep grinding, stay relentless, and success will be yours!
+      </p>
 
-
-        
-
-
-
-
-      {/* INPUT */}
-
-           <div className="mt-auto p-4 bg-gray-800">
-        <div className="flex items-center bg-white p-2">
-          <input
-            type="text"
-            className="flex-grow bg-transparent text-black focus:outline-none"
-            placeholder="Type a message..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-          <button
-            disabled={
-              !userThread?.threadId || !assistant || sending || !message.trim()
-            }
-            className="ml-4 bg-yellow-500 text-white px-4 py-2 rounded-full focus:outline-none disabled:bg-yellow-700"
-            onClick={sendMessage}
-          >
-            {sending ? "Sending..." : pollingRun ? "Polling Run..." : "Send"}
-          </button>
+      {/* Section Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 w-full max-w-4xl px-4">
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <h2 className="text-2xl font-bold mb-2">Section 1: BBLS</h2>
+          <p className="text-md">Biological and Biochemical Foundations of Living Systems.</p>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <h2 className="text-2xl font-bold mb-2">Section 2: CPBS</h2>
+          <p className="text-md">Chemical and Physical Foundations of Biological Systems.</p>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <h2 className="text-2xl font-bold mb-2">Section 3: PSBB</h2>
+          <p className="text-md">Psychological, Social, and Biological Foundations of Behavior.</p>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <h2 className="text-2xl font-bold mb-2">Section 4: CARS</h2>
+          <p className="text-md">Critical Analysis and Reasoning Skills.</p>
         </div>
       </div>
+
+     {/* Call to Action with Link to Chat Page */}
+     <Link href="/chat">
+        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg mb-8">
+          Start Practicing Now
+        </button>
+      </Link>
     </div>
-
-
-
-         
-
-
-
   );
-}
+};
 
-export default ChatPage;
+export default Home;

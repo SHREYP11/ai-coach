@@ -1,6 +1,6 @@
 import React from "react";
 
-const selectedStyle = "ring-2 ring-yellow-500 bg-yellow-500 bg-opacity-10";
+const selectedStyle = "ring-2 ring-red-500 bg-red-500 bg-opacity-10";
 const unselectedStyle = "hover:bg-gray-100";
 
 interface DifficultyCardProps {
@@ -25,7 +25,7 @@ function DifficultyCard({
     >
       <h2
         className={`font-bold text-xl ${
-          selected ? "text-yellow-500" : "text-black"
+          selected ? "text-red-500" : "text-black"
         }`}
       >
         {level}

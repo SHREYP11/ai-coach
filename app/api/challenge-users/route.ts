@@ -43,24 +43,34 @@ export async function POST(request: Request) {
     {
       role: "system",
       content: `
-        Generate an ultra-intense, hard-hitting motivational message, followed by a concise, bullet-pointed, no-equipment-needed workout plan. The time of day provided should be taken into account. This output should strictly contain two parts: first, a motivational message in the style of David Goggins, as depicted in Jesse Itzler's 'Living with a SEAL', but even more extreme. The message must be direct, confrontational, and incorporate Goggins' known phrases like 'poopy pants', 'stay hard', and 'taking souls'. The second part should be a workout list: intense, high-impact exercises that can be done anywhere, designed to be completed within 10 minutes. The output must only include these two components, nothing else.
-        
-        Here's an example output that you should follow:
-        
-        Time to get hard! No more excuses, no more poopy pants attitude. You're stronger than you think. Stay hard, take souls, and crush this morning with everything you've got. You have 10 minutes to obliterate this workout. This is your battlefield, and you're the warrior. Let's make every second count!
-        
-        - 30 Burpees – explode with every jump
-        - 40 Jumping Jacks – faster, push your limits
-        - 50 Mountain Climbers – relentless pace
-        - 60 High Knees – drive them up with fury
-        - 2 Minute Plank – solid and unyielding
-        `,
+        Generate an ultra-intense, MCAT-style passage and 5 questions with respect to that passage. The passage should reflect a difficult and complex topic from the MCAT curriculum and can be from any of the mcat topic categories, such as CARS, biochemistry or psychology. After the passage, provide 5 challenging multiple-choice questions related to the passage. Then, offer motivational feedback based on whether the user's answer is correct or incorrect. The feedback should be intense, challenging the user to push their limits, and reflect a "never satisfied" mentality, while offering guidance on improvement.
+  
+        Example format:
+  
+        Passage:
+        Cells rely on ion channels to maintain homeostasis, allowing the transport of charged particles across membranes. These channels are crucial for nerve signal transmission. In patients with cystic fibrosis, a genetic mutation affects the CFTR channel, impairing chloride ion transport. This disrupts the balance of fluids in the lungs and pancreas, leading to the accumulation of thick mucus...
+  
+        Question:
+        Which of the following is the primary function of the CFTR protein in the lungs?
+        - A) Transport of glucose across cell membranes
+        - B) Regulation of sodium ion concentration
+        - C) Chloride ion transport across epithelial cells
+        - D) Uptake of oxygen into the bloodstream
+  
+        Motivational feedback (correct):
+        "Correct! But don’t get too comfortable. This is just one step on the path to crushing the MCAT. Push harder, study more, and dominate every topic until there's no room for error. You’ve got more in you!"
+  
+        Motivational feedback (incorrect):
+        "Wrong answer. But good—that’s where the growth happens. Review the passage, understand the mechanics, and come back stronger. The only way forward is through. Keep grinding, no time for excuses!"`,
     },
     {
       role: "user",
-      content: `Generate a new David Goggins workout. Remember, only respond in the format specifed earlier. Nothing else`,
+      content: `Generate an MCAT passage with question and motivational feedback. Remember, follow the format specified above. Nothing else.`,
     },
   ];
+  
+  
+  
 
   //  Use OpenAI to generate work out
   const {
