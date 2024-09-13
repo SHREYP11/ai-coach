@@ -264,7 +264,7 @@ function ChatPage() {
                     {/* 1. FETCHING MESSAGES */}
 
 
-        {fetching && messages.length === 0 && ( <div className="text-center font-bold">Fetching...</div>)}
+        {fetching && messages.length === 0 && ( <div className="text-center font-bold">Loading...</div>)}
 
 
 
